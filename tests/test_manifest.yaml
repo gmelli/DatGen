@@ -1,0 +1,349 @@
+# DatGen Test Manifest - Machine-Readable Test Specifications
+# This file drives automatic test generation
+
+metadata:
+  version: "1.0"
+  created: "2025-09-20"
+  total_tests: 70
+  priority_levels:
+    P1: "Critical - Must pass for release"
+    P2: "Important - Should pass for quality"
+    P3: "Nice to have - Future enhancement"
+
+test_suites:
+  compatibility:
+    description: "C version compatibility tests"
+    tests:
+      - id: C001
+        name: "Exact output match with seed"
+        priority: P1
+        params:
+          n: 100
+          m: 10
+          c: 2
+          seed: 42
+        expected:
+          type: exact_file_match
+          file: fixtures/c_100_10_2_s42.csv
+
+      - id: C002
+        name: "Deterministic with seed"
+        priority: P1
+        params:
+          n: 100
+          m: 10
+          c: 2
+          seed: 42
+        expected:
+          type: identical_on_multiple_runs
+          runs: 3
+
+      - id: C003
+        name: "Random without seed"
+        priority: P1
+        params:
+          n: 100
+          m: 10
+          c: 2
+        expected:
+          type: different_on_multiple_runs
+          runs: 3
+
+      - id: C004
+        name: "CSV format compatibility"
+        priority: P1
+        params:
+          n: 10
+          m: 5
+          c: 2
+          seed: 1
+        expected:
+          type: format_check
+          format: csv
+          precision: 6
+          delimiter: ","
+
+      - id: C010
+        name: "Parameter n range"
+        priority: P1
+        test_type: parametric
+        param_tests:
+          - {n: 1, m: 5, c: 2, seed: 1}
+          - {n: 100, m: 5, c: 2, seed: 1}
+          - {n: 10000, m: 5, c: 2, seed: 1}
+        expected:
+          type: shape_check
+          shape_formula: "(n, m+1)"
+
+      - id: C011
+        name: "Parameter m range"
+        priority: P1
+        test_type: parametric
+        param_tests:
+          - {n: 100, m: 1, c: 2, seed: 1}
+          - {n: 100, m: 10, c: 2, seed: 1}
+          - {n: 100, m: 100, c: 2, seed: 1}
+        expected:
+          type: shape_check
+          shape_formula: "(n, m+1)"
+
+      - id: C012
+        name: "Parameter c range"
+        priority: P1
+        test_type: parametric
+        param_tests:
+          - {n: 100, m: 10, c: 2, seed: 1}
+          - {n: 100, m: 10, c: 5, seed: 1}
+          - {n: 100, m: 10, c: 10, seed: 1}
+        expected:
+          type: class_check
+          unique_classes_formula: "c"
+
+      - id: C014
+        name: "Noise parameter"
+        priority: P1
+        test_type: parametric
+        param_tests:
+          - {n: 1000, m: 10, c: 2, seed: 42, noise: 0.0}
+          - {n: 1000, m: 10, c: 2, seed: 42, noise: 0.5}
+          - {n: 1000, m: 10, c: 2, seed: 42, noise: 1.0}
+        expected:
+          type: noise_effect
+          check: "increasing_entropy"
+
+  statistical:
+    description: "Statistical properties tests"
+    tests:
+      - id: S001
+        name: "Gaussian distribution properties"
+        priority: P1
+        params:
+          n: 10000
+          m: 5
+          c: 2
+          seed: 42
+          distribution: gaussian
+        expected:
+          type: statistical
+          mean: 0.0
+          mean_tolerance: 0.01
+          std: 1.0
+          std_tolerance: 0.01
+
+      - id: S002
+        name: "Uniform distribution range"
+        priority: P1
+        params:
+          n: 10000
+          m: 5
+          c: 2
+          seed: 42
+          distribution: uniform
+        expected:
+          type: range_check
+          min: 0.0
+          max: 1.0
+
+      - id: S003
+        name: "Class balance"
+        priority: P1
+        params:
+          n: 10000
+          m: 10
+          c: 3
+          seed: 42
+        expected:
+          type: class_balance
+          tolerance_percent: 5
+
+      - id: S010
+        name: "Cross-platform reproducibility"
+        priority: P1
+        params:
+          n: 1000
+          m: 10
+          c: 2
+          seed: 12345
+        expected:
+          type: platform_independent
+          platforms: ["linux", "darwin", "win32"]
+
+  performance:
+    description: "Performance benchmarks"
+    tests:
+      - id: P001
+        name: "Small dataset speed"
+        priority: P1
+        params:
+          n: 1000
+          m: 10
+          c: 2
+        expected:
+          type: timing
+          max_seconds: 0.1
+
+      - id: P002
+        name: "Medium dataset speed"
+        priority: P1
+        params:
+          n: 100000
+          m: 10
+          c: 2
+        expected:
+          type: timing
+          max_seconds: 2.0
+
+      - id: P003
+        name: "Large dataset speed"
+        priority: P2
+        params:
+          n: 1000000
+          m: 10
+          c: 2
+        expected:
+          type: timing
+          max_seconds: 20.0
+
+      - id: P004
+        name: "Memory efficiency"
+        priority: P1
+        params:
+          n: 100000
+          m: 100
+          c: 10
+        expected:
+          type: memory
+          max_mb_per_million_cells: 100
+
+      - id: P010
+        name: "Speed vs C version"
+        priority: P1
+        params:
+          n: 100000
+          m: 20
+          c: 5
+        expected:
+          type: relative_performance
+          baseline: c_version
+          max_slowdown: 5.0
+
+  api:
+    description: "Python API tests"
+    tests:
+      - id: A001
+        name: "Classic API constructor"
+        priority: P1
+        test_type: api
+        method: "DatGenClassic"
+        params:
+          n_samples: 100
+          n_features: 10
+          n_classes: 2
+          random_state: 42
+        expected:
+          type: instance_check
+          class: DatGenClassic
+
+      - id: A002
+        name: "DataFrame output"
+        priority: P1
+        test_type: api
+        method: "generate"
+        expected:
+          type: type_check
+          return_type: "pandas.DataFrame"
+
+      - id: A003
+        name: "CSV compatibility"
+        priority: P1
+        test_type: api
+        method: "to_csv"
+        expected:
+          type: format_match
+          reference: c_version
+
+      - id: A010
+        name: "Fluent interface"
+        priority: P2
+        test_type: api
+        chain:
+          - method: "DatGenModern"
+          - method: "with_samples"
+            args: [1000]
+          - method: "with_features"
+            args: [10]
+          - method: "generate"
+        expected:
+          type: method_chaining
+          final_shape: [1000, 11]
+
+  cli:
+    description: "Command line interface tests"
+    tests:
+      - id: CLI001
+        name: "Basic CLI arguments"
+        priority: P1
+        command: "python -m datgen -n 100 -m 10 -c 2 -s 42"
+        expected:
+          type: stdout_match
+          reference: "./datgen -n 100 -m 10 -c 2 -s 42"
+
+      - id: CLI002
+        name: "Help text"
+        priority: P1
+        command: "python -m datgen --help"
+        expected:
+          type: help_contains
+          required_options: ["-n", "-m", "-c", "-s", "--noise", "--output"]
+
+      - id: CLI003
+        name: "Error handling"
+        priority: P2
+        command: "python -m datgen -n -1"
+        expected:
+          type: error
+          error_contains: "must be positive"
+
+  integration:
+    description: "Integration with other tools"
+    tests:
+      - id: I001
+        name: "Scikit-learn compatibility"
+        priority: P1
+        test_type: integration
+        code: |
+          from sklearn.model_selection import train_test_split
+          from sklearn.ensemble import RandomForestClassifier
+          gen = DatGenClassic(n_samples=1000, n_features=10, n_classes=2)
+          df = gen.generate()
+          X = df.iloc[:, :-1]
+          y = df.iloc[:, -1]
+          X_train, X_test, y_train, y_test = train_test_split(X, y)
+          clf = RandomForestClassifier().fit(X_train, y_train)
+        expected:
+          type: no_errors
+
+      - id: I002
+        name: "Pandas operations"
+        priority: P1
+        test_type: integration
+        code: |
+          gen = DatGenClassic(n_samples=1000, n_features=5, n_classes=3)
+          df = gen.generate()
+          grouped = df.groupby('class').mean()
+          corr = df.corr()
+        expected:
+          type: operations_succeed
+
+# Test generation configuration
+generation:
+  output_dir: "tests/"
+  template: "pytest"
+  grouping: "by_suite"
+  fixtures:
+    generate_c_references: true
+    reference_dir: "tests/fixtures/"
+  markers:
+    P1: "critical"
+    P2: "important"
+    P3: "enhancement"
