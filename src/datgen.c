@@ -107,11 +107,14 @@
 *****************************************************************/
 
 #include	<math.h>	/* log() */
-#include	<malloc.h>	/* calloc() */
+/* malloc.h is not portable - stdlib.h provides malloc/calloc on all platforms */
+#ifdef __linux__
+#include	<malloc.h>	/* calloc() - Linux only */
+#endif
 #include 	<stdio.h>	/* f____() */
 #include 	<string.h>	/* strtok() */
 #include	<time.h>	/* time() */
-#include	<stdlib.h>  /* qsort() */
+#include	<stdlib.h>  /* qsort(), calloc() on macOS/BSD */
 
 
 /*****************************************************************
