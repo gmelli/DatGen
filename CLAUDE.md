@@ -9,14 +9,21 @@ DatGen is a synthetic data generator from 1997 being modernized with a Python po
 When the user says these phrases, take the following actions:
 
 #### "wind down" / "sign off" / "check in"
-- Stage all changes with `git add -A`
-- Create a comprehensive commit message describing the work done
-- Commit the changes using git
-- Verify the commit succeeded
-- Provide a brief summary of what was committed
+- Run the `./sign_off.sh` script which will:
+  - Check both repositories for uncommitted changes
+  - Commit any changes with descriptive message
+  - Push all commits to GitHub
+  - Verify everything is saved
+- Alternative manual process:
+  - Stage all changes with `git add -A`
+  - Create a comprehensive commit message describing the work done
+  - Commit the changes using git
+  - Push to GitHub with `git push`
+  - Verify the commit succeeded
+  - Provide a brief summary of what was committed
 
 #### "commit" / "save progress"
-- Same as above - create a git commit with all current changes
+- Same as above - use `./sign_off.sh` or manually commit and push
 
 ## Project-Specific Knowledge
 
