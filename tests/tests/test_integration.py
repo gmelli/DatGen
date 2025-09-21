@@ -25,7 +25,7 @@ except ImportError:
 
 @pytest.mark.p1
 @pytest.mark.critical
-def test_i001_scikit-learn_compatibility():
+def test_i001_scikit_learn_compatibility():
     """Test I001: Scikit-learn compatibility"""
 
     # Basic test - implementation needed
